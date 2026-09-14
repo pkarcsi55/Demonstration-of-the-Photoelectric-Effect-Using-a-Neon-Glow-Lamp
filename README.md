@@ -34,7 +34,7 @@ A repository a kísérleti eszköz reprodukálásához és továbbfejlesztéséh
 
 * ESP32 firmware;
 * kapcsolási rajz;
-* [NYÁK-terv és gyártási fájlok];(Hardver/Gerber_Glimm_PCB_Glimm_2024-05-13.zip)
+* [NYÁK-terv és gyártási fájlok](Hardver/Gerber_Glimm_PCB_Glimm_2024-05-13.zip);
 * alkatrészlista;
 * mérési és adatgyűjtési segédanyagok;
 * a kísérletekhez kapcsolódó dokumentáció.
