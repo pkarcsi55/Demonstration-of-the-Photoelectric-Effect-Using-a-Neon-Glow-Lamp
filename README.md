@@ -33,7 +33,7 @@ A mérési adatok számítógépen is rögzíthetők és statisztikailag kiért�
 A repository a kísérleti eszköz reprodukálásához és továbbfejlesztéséhez szükséges anyagokat tartalmazza:
 
 * ESP32 firmware;
-* kapcsolási rajz;
+* [kapcsolási rajz](Hardver/Schematic_Glimm_2026-08-24.pdf);
 * [NYÁK-terv és gyártási fájlok](Hardver/Gerber_Glimm_PCB_Glimm_2024-05-13.zip);
 * alkatrészlista;
 * mérési és adatgyűjtési segédanyagok;
