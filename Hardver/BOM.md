@@ -16,7 +16,7 @@ Equivalent parts may be substituted where appropriate.
 | R3     | Resistor              |                      10 MΩ |    1 |                                                    |
 | R4     | Resistor              |                     220 kΩ |    1 |                                                    |
 | R6     | Resistor              |                       1 kΩ |    1 |                                                    |
-| S1     | SPDT switch           |                          – |    1 |                                                    |
+| S1     | SPDT switch           |                          – |    1 |LCSC part: C136722                                  |
 | SW1    | Push button           | TS-1103S-C-K or equivalent |    1 |                                                    |
 | U1     | Microcontroller board |         Wemos LOLIN32 Lite |    1 | ESP32                                              |
 | U2     | NPN transistor        |                     MPSA42 |    1 | High-voltage transistor, TO-92                     |
