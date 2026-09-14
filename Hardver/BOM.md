@@ -9,7 +9,7 @@ Equivalent parts may be substituted where appropriate.
 | C3, C4 | Capacitor             |                     820 nF |    2 | Timing capacitors                                  |
 | C5     | Ceramic capacitor     |                      10 nF |    1 | Vishay A103K15X7RF5TAA or equivalent               |
 | D1–D3  | Rectifier diode       |                      FR157 |    3 | DO-15                                              |
-| GL1    | Neon glow lamp        |                          – |    1 | Experimental light-sensitive glow lamp             |
+| GL1    | Neon glow lamp        |         GLIMM1-OR (NEON-3) |    1 | Experimental light-sensitive glow lamp             |
 | L1     | Inductor              |                    4.7 mH* |    1 | *Value should be checked against the assembled PCB |
 | R1     | Resistor              |                       10 Ω |    1 |                                                    |
 | R2     | Resistor              |                      20 MΩ |    1 | May be implemented as 2 × 10 MΩ in series          |
