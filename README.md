@@ -36,7 +36,7 @@ A repository a kísérleti eszköz reprodukálásához és továbbfejlesztéséh
 * [kapcsolási rajz](Hardver/Schematic_Glimm_2026-08-24.pdf)
 * [NYÁK-terv és gyártási fájlok](Hardver/Gerber_Glimm_PCB_Glimm_2024-05-13.zip)
 * [alkatrészlista](Hardver/BOM.md)
-* [mérési és adatgyűjtési segédanyagok](code/GLIM_2026.xlsx).
+* [mérési és adatgyűjtési segédanyagok](code/GLIM_2026.xlsx)
 
 ## Oktatási alkalmazás
 
