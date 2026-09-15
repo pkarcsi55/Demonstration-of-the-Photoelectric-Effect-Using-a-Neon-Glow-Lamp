@@ -1,7 +1,7 @@
 // Glimmlámpás demonstrációs eszköz a fényelektromos jelenség tanulmányozásához
 // Hardver: WeMos LOLIN32 Lite (ESP32)
-// Programverzió: 1.1
-// Dátum: 2026.08.30.
+// Programverzió: 1.2
+// Dátum: 2026.09.15.
 // Készítette: Piláth Károly.
 
 #include <math.h>
@@ -33,6 +33,7 @@ const uint16_t ALAPERTELMEZETT_NAGYFESZ_FREKVENCIA_HZ = 500;
 const uint16_t MIN_NAGYFESZ_FREKVENCIA_HZ = 300;
 const uint16_t MAX_NAGYFESZ_FREKVENCIA_HZ = 700;
 const uint8_t STATISZTIKAI_ABLAK_MERETE = 30;
+const uint8_t FREKVENCIA_ATLAGOLASI_PERIODUSOK = 10;
 
 enum class CsucsfigyeloAllapot {
   CSUCSOT_KERES,
@@ -64,6 +65,13 @@ double csucsfeszultsegOsszegV = 0.0;
 double csucsfeszultsegNegyzetOsszegV2 = 0.0;
 float csucsfeszultsegAtlagV = 0.0f;
 float csucsfeszultsegSzorasV = 0.0f;
+uint32_t kisulesiPeriodusokMs[FREKVENCIA_ATLAGOLASI_PERIODUSOK] = {};
+uint8_t kovetkezoPeriodusIndex = 0;
+uint8_t taroltPeriodusokSzama = 0;
+uint64_t kisulesiPeriodusOsszegMs = 0;
+uint32_t elozoKisulesIdejeMs = 0;
+bool vanElozoKisulesiIdopont = false;
+float atlagosKisulesiFrekvenciaHz = 0.0f;
 CsucsfigyeloAllapot csucsfigyeloAllapot =
   CsucsfigyeloAllapot::UJ_EMELKEDESRE_VAR;
 
@@ -71,6 +79,8 @@ void rovidHangjelzes();
 void duplaHangjelzes();
 void sorosParancsFeldolgozasa(String parancs);
 void csucsfeszultsegHozzaadasaAStatisztikahoz(float csucsfeszultsegV);
+void kisulesiFrekvenciaFrissitese(uint32_t kisulesIdejeMs);
+void frekvenciaMeresNullazasa();
 void statisztikaNullazasa();
 
 void setup() {
@@ -149,6 +159,7 @@ void loop() {
       gyujtottCsurfeszultsegV = 0.0f;
       egymasUtaniEmelkedoMintak = 0;
       csucsfigyeloAllapot = CsucsfigyeloAllapot::UJ_EMELKEDESRE_VAR;
+      frekvenciaMeresNullazasa();
 
       if (nagyfeszultsegKikapcsolva) {
         ledcWriteTone(NAGYFESZULTSEG_JEL_PIN, 0);
@@ -240,6 +251,7 @@ void loop() {
           csucsfeszultsegHozzaadasaAStatisztikahoz(
             legutobbiCsurfeszultsegV
           );
+          kisulesiFrekvenciaFrissitese(millis());
           csucsfigyeloAllapot = CsucsfigyeloAllapot::UJ_EMELKEDESRE_VAR;
           egymasUtaniEmelkedoMintak = 0;
 
@@ -270,7 +282,9 @@ void loop() {
     Serial.print(",");
     Serial.print(csucsfeszultsegAtlagV, 2);
     Serial.print(",");
-    Serial.println(csucsfeszultsegSzorasV, 2);
+    Serial.print(csucsfeszultsegSzorasV, 2);
+    Serial.print(",");
+    Serial.println(atlagosKisulesiFrekvenciaHz, 3);
   }
 }
 
@@ -366,6 +380,49 @@ void csucsfeszultsegHozzaadasaAStatisztikahoz(float csucsfeszultsegV) {
   csucsfeszultsegSzorasV = static_cast<float>(sqrt(mintaVarianciaV2));
 }
 
+void kisulesiFrekvenciaFrissitese(uint32_t kisulesIdejeMs) {
+  if (!vanElozoKisulesiIdopont) {
+    elozoKisulesIdejeMs = kisulesIdejeMs;
+    vanElozoKisulesiIdopont = true;
+    return;
+  }
+
+  // Az előjel nélküli kivonás a millis() átfordulását is kezeli.
+  const uint32_t ujPeriodusMs = kisulesIdejeMs - elozoKisulesIdejeMs;
+  elozoKisulesIdejeMs = kisulesIdejeMs;
+
+  if (taroltPeriodusokSzama == FREKVENCIA_ATLAGOLASI_PERIODUSOK) {
+    kisulesiPeriodusOsszegMs -= kisulesiPeriodusokMs[kovetkezoPeriodusIndex];
+  } else {
+    taroltPeriodusokSzama++;
+  }
+
+  kisulesiPeriodusokMs[kovetkezoPeriodusIndex] = ujPeriodusMs;
+  kovetkezoPeriodusIndex =
+    (kovetkezoPeriodusIndex + 1) % FREKVENCIA_ATLAGOLASI_PERIODUSOK;
+  kisulesiPeriodusOsszegMs += ujPeriodusMs;
+
+  // Csak 10 teljes periódus összegyűlése után küldünk frekvenciát.
+  if (taroltPeriodusokSzama < FREKVENCIA_ATLAGOLASI_PERIODUSOK ||
+      kisulesiPeriodusOsszegMs == 0) {
+    atlagosKisulesiFrekvenciaHz = 0.0f;
+    return;
+  }
+
+  atlagosKisulesiFrekvenciaHz =
+    1000.0f * FREKVENCIA_ATLAGOLASI_PERIODUSOK /
+    static_cast<float>(kisulesiPeriodusOsszegMs);
+}
+
+void frekvenciaMeresNullazasa() {
+  kovetkezoPeriodusIndex = 0;
+  taroltPeriodusokSzama = 0;
+  kisulesiPeriodusOsszegMs = 0;
+  elozoKisulesIdejeMs = 0;
+  vanElozoKisulesiIdopont = false;
+  atlagosKisulesiFrekvenciaHz = 0.0f;
+}
+
 void statisztikaNullazasa() {
   kovetkezoStatisztikaiMintaIndex = 0;
   statisztikaiMintakSzama = 0;
@@ -373,4 +430,5 @@ void statisztikaNullazasa() {
   csucsfeszultsegNegyzetOsszegV2 = 0.0;
   csucsfeszultsegAtlagV = 0.0f;
   csucsfeszultsegSzorasV = 0.0f;
+  frekvenciaMeresNullazasa();
 }
